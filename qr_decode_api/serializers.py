@@ -58,6 +58,7 @@ class DecodeViewSerializer(serializers.ModelSerializer):
             print(dec)
             return dec,"no 2nd qr"
         else:
+            qrCodeDetector = cv2.QRCodeDetector()
             all_qrcodes = qrCodeDetector.detectAndDecodeMulti(image)
             if len(all_qrcodes[1]) > 1:
                 v1 = all_qrcodes[1][0]
