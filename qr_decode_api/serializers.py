@@ -31,7 +31,7 @@ class DecodeViewSerializer(serializers.ModelSerializer):
 
         diag.save()
         decoded_text, dt2 = self.decode_qr(data.get("file_id"))
-        data['decoded_text'] = diag.decoded_text
+        data['decoded_text'] = decoded_text
         data['decoded_text2'] = dt2
         diag.decoded_text = " qr1 decoded : "+ decoded_text + " qr2 decoded : " + dt2
         diag.save()
