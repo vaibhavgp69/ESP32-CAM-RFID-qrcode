@@ -26,7 +26,7 @@ SECRET_KEY = 'django-insecure-_1lpaly(1c2m39*t4-f6td%(0$x86r%yvy@x7*w)4!g9@+j(4s
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ["smartassess.onrender.com",'127.0.0.1']
+ALLOWED_HOSTS = ["esp32-cam-rfid-qrcode.onrender.com",'127.0.0.1']
 
 
 # Application definition
