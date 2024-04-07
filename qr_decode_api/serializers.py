@@ -59,7 +59,7 @@ class DecodeViewSerializer(serializers.ModelSerializer):
             v1 = all_qrcodes[1][0]
             v2= all_qrcodes[1][1]
             return v1,v2
-        else if vertices_array is not None:
+        elif vertices_array is not None:
             print("QRCode data:")
             print(dec)
             return dec,"no 2nd qr"
