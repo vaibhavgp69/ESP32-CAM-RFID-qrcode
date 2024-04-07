@@ -53,21 +53,18 @@ class DecodeViewSerializer(serializers.ModelSerializer):
         image = cv2.imread(filename)
         detector = cv2.QRCodeDetector()
         dec, vertices_array, binary_qrcode = detector.detectAndDecode(image)
-        if vertices_array is not None:
+        qrCodeDetector = cv2.QRCodeDetector()
+        all_qrcodes = qrCodeDetector.detectAndDecodeMulti(image)
+        if len(all_qrcodes[1]) > 1:
+            v1 = all_qrcodes[1][0]
+            v2= all_qrcodes[1][1]
+            return v1,v2
+        else if vertices_array is not None:
             print("QRCode data:")
             print(dec)
             return dec,"no 2nd qr"
+             
         else:
-            qrCodeDetector = cv2.QRCodeDetector()
-            all_qrcodes = qrCodeDetector.detectAndDecodeMulti(image)
-            if len(all_qrcodes[1]) > 1:
-                v1 = all_qrcodes[1][0]
-                v2= all_qrcodes[1][1]
-                return v1,v2
-            else:
-                print("There was some error")
-                return "error","error"
-
             print("There was some error")
             return "error","error"
         
