@@ -5,5 +5,6 @@ urlpatterns = [
     
 
 path('decode/', views.DecodeView.as_view(), name="decode"),
+path('decode/image/', views.DecodeImageView.as_view(), name="decodeimage"),
 
 ]
