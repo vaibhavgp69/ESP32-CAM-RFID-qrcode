@@ -84,9 +84,9 @@ DATABASES = {
     }
 }
 
-# DATABASES['default'] = dj_database_url.parse('postgres://esp32_decode_user:yOGMaNwI2o8NRVvqPP2NAswpRom7VHId@dpg-co770tud3nmc73e5a110-a.oregon-postgres.render.com/esp32_decode')
-database_url = os.environ.get("DATABASE_URL")
-DATABASES['default'] = dj_database_url.parse(database_url)
+DATABASES['default'] = dj_database_url.parse('postgres://esp32_decode_user:yOGMaNwI2o8NRVvqPP2NAswpRom7VHId@dpg-co770tud3nmc73e5a110-a.oregon-postgres.render.com/esp32_decode')
+# database_url = os.environ.get("DATABASE_URL")
+# DATABASES['default'] = dj_database_url.parse(database_url)
 
 # Password validation
 # https://docs.djangoproject.com/en/3.2/ref/settings/#auth-password-validators

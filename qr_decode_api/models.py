@@ -11,11 +11,14 @@ class Decode(models.Model):
     
 
 class DecImage(models.Model):
-    image = models.ImageField(upload_to='qr_images', )             
+    rep = models.CharField(max_length=500,null=True, default = "")
+    top_image = models.ImageField(upload_to='top_images', )   
+    bottom_image = models.ImageField(upload_to='bottom_images', )    
+    name =   models.CharField(max_length=500,null=True, default = "")    
     decoded_text = models.CharField(max_length=500,null=True, default = "")                                                                          
 
 
     
     def __str__(self):
-        return self.image.url
+        return self.rep + self.name + self.decoded_text
        

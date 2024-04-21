@@ -1,7 +1,7 @@
 
 from rest_framework import generics
 from .models import Decode, DecImage
-from .serializers import DecodeViewSerializer, DecodeImageViewSerializer
+from .serializers import DecodeViewSerializer, DecodeImageViewSerializer, DecodeTopImageViewSerializer,DecodeBottomImageViewSerializer
 
 
 
@@ -12,5 +12,16 @@ class DecodeView(generics.ListCreateAPIView):
 class DecodeImageView(generics.ListCreateAPIView):
     queryset = DecImage.objects.all()
     serializer_class = DecodeImageViewSerializer
+
+class DecodeTopImageView(generics.ListCreateAPIView):
+    queryset = DecImage.objects.all()
+    serializer_class = DecodeTopImageViewSerializer
+
+
+class DecodeBottomImageView(generics.ListCreateAPIView):
+    queryset = DecImage.objects.all()
+    serializer_class = DecodeBottomImageViewSerializer
+
+
 
     
