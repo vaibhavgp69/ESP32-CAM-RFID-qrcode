@@ -118,7 +118,7 @@ class DecodeImageViewSerializer(serializers.ModelSerializer):
     
     def create(self, data):
 
-        decoded_text = "some stuff"
+        decoded_text = "write"
         data['status'] = ''
 
         diag_filter = DecImage.objects.filter(rep=data.get("rep")).first()
@@ -130,22 +130,32 @@ class DecodeImageViewSerializer(serializers.ModelSerializer):
                 bottom_image = data.get("bottom_image"),
                 decoded_text=decoded_text,
             )
+                
+            diag.save()
+            data['status'] += self.name_sheet(diag.name,decoded_text) + " -----> "
+            decoded_text, dt2 = self.decode_qr(diag.top_image.url)
+            data['decoded_text'] = decoded_text
+            data['decoded_text2'] = dt2
+            diag.decoded_text = "aqr1 decoded : "+ decoded_text + " qr2 decoded : " + dt2
+            diag.save()
+            data['status'] += self.img1_sheet(diag.top_image.url,decoded_text,dt2) + " -----> "
+            data['status'] += self.img2_sheet(diag.bottom_image.url,"none") 
         else:
             data['status'] += " Updating existing entry -----> "
             diag =  DecImage.objects.get(rep = data.get("rep"), name = data.get("name"))
             diag.top_image = data.get("top_image")
             diag.bottom_image = data.get("bottom_image")
+            decoded_text = "write"
+            diag.save()
+            data['status'] += self.name_sheet(diag.name,decoded_text) + " -----> "
+            decoded_text, dt2 = self.decode_qr(diag.top_image.url)
+            data['decoded_text'] = decoded_text
+            data['decoded_text2'] = dt2
+            diag.decoded_text = "aqr1 decoded : "+ decoded_text + " qr2 decoded : " + dt2
+            diag.save()
+            data['status'] += self.img1_sheet(diag.top_image.url,decoded_text,dt2) + " -----> "
+            data['status'] += self.img2_sheet(diag.bottom_image.url,"update") 
 
-
-        diag.save()
-        data['status'] += self.name_sheet(diag.name) + " -----> "
-        decoded_text, dt2 = self.decode_qr(diag.top_image.url)
-        data['decoded_text'] = decoded_text
-        data['decoded_text2'] = dt2
-        diag.decoded_text = " qr1 decoded : "+ decoded_text + " qr2 decoded : " + dt2
-        diag.save()
-        data['status'] += self.img1_sheet(diag.top_image.url,decoded_text,dt2) + " -----> "
-        data['status'] += self.img2_sheet(diag.bottom_image.url) 
 
         data['top_img_url'] = diag.top_image.url
         data['bottom_img_url'] = diag.bottom_image.url
@@ -173,8 +183,8 @@ class DecodeImageViewSerializer(serializers.ModelSerializer):
             print("There was some error")
             return "error","error"
         
-    def name_sheet(self,name):
-        url = f'https://script.google.com/macros/s/AKfycbyb8-vtSzSJRBJKMTUIz55UGQ7MAPKGhHpY8NbllUmMtU3jVN3ZbU2svj8JsQpORGLybQ/exec?sts=write&mac=&ser=&nam={name}&im1=&im2='   
+    def name_sheet(self,name,sts):
+        url = f'https://script.google.com/macros/s/AKfycbwhsPa5xJPl4zruZI0BxKH0i3JUTBq0M9Gr9YthIgAvgnU3fANK-5XSUS5ipb1SfylU7g/exec/exec?sts={sts}e&mac=&ser=&nam={name}&im1='   
         response = requests.get(url)
         return "Name added"
     
@@ -201,10 +211,10 @@ class DecodeImageViewSerializer(serializers.ModelSerializer):
 
         return " Image 1 uploaded"
     
-    def img2_sheet(self,filename,):
-                
+    def img2_sheet(self,filename,condition):
+            
 
-        url = 'https://script.google.com/macros/s/AKfycbyUOuyUiCRYYFU_jS3GJnO5HRtKZiTQlue59LplemNV7NBg718lSYMkAf7bCpz43M3c/exec'
+        url = 'https://script.google.com/macros/s/AKfycbxQdVJsQ9Cg0WoiTcdIhnduicmj7QO86mfiXVh3mXESs8yNXQodTTomUlrXCsgCqm-Z/exec'
         filename = "."+filename
         with open(filename, 'rb') as image_file:
             encoded_image = base64.b64encode(image_file.read()).decode('utf-8')
@@ -212,6 +222,7 @@ class DecodeImageViewSerializer(serializers.ModelSerializer):
             'filename': 'ESP32-CAM.jpg',
             'mimetype': 'image/jpeg',
                 'data': encoded_image,
+                'condition': condition,
         }
 
         headers = {
@@ -220,7 +231,6 @@ class DecodeImageViewSerializer(serializers.ModelSerializer):
         }
 
         response = requests.post(url, data=params, headers=headers)
-
         return " Image 2 uploaded"
 
 # ---------------------------------------------------------------------------------------------
@@ -249,8 +259,7 @@ class DecodeTopImageViewSerializer(serializers.ModelSerializer):
     
     
     def create(self, data):
-
-        decoded_text = "some stuff"
+        decoded_text = "write"
         data['status'] = ''
         diag_filter = DecImage.objects.filter(rep=data.get("rep")).first()
         if diag_filter == None:
@@ -261,19 +270,24 @@ class DecodeTopImageViewSerializer(serializers.ModelSerializer):
                 bottom_image = data.get("top_image"),
                 decoded_text=decoded_text,
             )
+            diag.save()
+            data['status'] += self.name_sheet(diag.name,decoded_text) + " -----> "
+            decoded_text, dt2 = self.decode_qr(diag.top_image.url)
+            data['decoded_text'] = decoded_text
+            data['decoded_text2'] = dt2
+            diag.decoded_text = "qr1 decoded : "+ decoded_text + " qr2 decoded : " + dt2
         else:
             data['status'] += " Updating existing entry -----> "
             diag =  DecImage.objects.get(rep = data.get("rep"), name = data.get("name"))
             diag.top_image = data.get("top_image")
             diag.bottom_image = data.get("top_image")
-
-
-        diag.save()
-        data['status'] += self.name_sheet(diag.name) + " -----> "
-        decoded_text, dt2 = self.decode_qr(diag.top_image.url)
-        data['decoded_text'] = decoded_text
-        data['decoded_text2'] = dt2
-        diag.decoded_text = " qr1 decoded : "+ decoded_text + " qr2 decoded : " + dt2
+            decoded_text = 'update'
+            diag.save()
+            data['status'] += self.name_sheet(diag.name,decoded_text) + " -----> "
+            decoded_text, dt2 = self.decode_qr(diag.top_image.url)
+            data['decoded_text'] = decoded_text
+            data['decoded_text2'] = dt2
+            diag.decoded_text = "aqr1 decoded : "+ decoded_text + " qr2 decoded : " + dt2
         diag.save()
         data['status'] += self.img1_sheet(diag.top_image.url,decoded_text,dt2) + " -----> "
         data['top_img_url'] = diag.top_image.url
@@ -295,16 +309,17 @@ class DecodeTopImageViewSerializer(serializers.ModelSerializer):
             return v1,v2
         elif vertices_array is not None:
             print("QRCode data:")
-            print(dec)
             return dec,"no 2nd qr"
              
         else:
             print("There was some error")
             return "error","error"
         
-    def name_sheet(self,name):
-        url = f'https://script.google.com/macros/s/AKfycbyb8-vtSzSJRBJKMTUIz55UGQ7MAPKGhHpY8NbllUmMtU3jVN3ZbU2svj8JsQpORGLybQ/exec?sts=write&mac=&ser=&nam={name}&im1=&im2='   
+    def name_sheet(self,name,sts):
+        print(sts)
+        url = f'https://script.google.com/macros/s/AKfycbwhsPa5xJPl4zruZI0BxKH0i3JUTBq0M9Gr9YthIgAvgnU3fANK-5XSUS5ipb1SfylU7g/exec?sts={sts}&mac=&ser=&nam={name}&im1='   
         response = requests.get(url)
+        print(response)
         return "Name added"
     
     def img1_sheet(self,filename,d1,d2):
@@ -361,9 +376,20 @@ class DecodeBottomImageViewSerializer(serializers.ModelSerializer):
 
         data['status'] = ''
         diag =  DecImage.objects.get(rep = data.get("rep"))
+        if diag.decoded_text[0] == 'q':
+            data['decoded_text2'] = 'new'
+            diag.decoded_text = "a"+diag.decoded_text
+            diag.save()
+            print("Here in new")
+        else:
+           
+            print("Here in bototm")
+            data['decoded_text2'] = 'update'
+
+
         diag.bottom_image = data.get("bottom_image")
         diag.save()
-        data['status'] += self.img2_sheet(diag.bottom_image.url) 
+        data['status'] += self.img2_sheet(diag.bottom_image.url,data['decoded_text2'] ) 
         data['top_img_url'] = diag.top_image.url
         data['bottom_img_url'] = diag.bottom_image.url
         data['name'] = diag.name
@@ -372,10 +398,10 @@ class DecodeBottomImageViewSerializer(serializers.ModelSerializer):
 
         return data
     
-    def img2_sheet(self,filename,):
+    def img2_sheet(self,filename,condition):
             
 
-        url = 'https://script.google.com/macros/s/AKfycbyUOuyUiCRYYFU_jS3GJnO5HRtKZiTQlue59LplemNV7NBg718lSYMkAf7bCpz43M3c/exec'
+        url = 'https://script.google.com/macros/s/AKfycbxQdVJsQ9Cg0WoiTcdIhnduicmj7QO86mfiXVh3mXESs8yNXQodTTomUlrXCsgCqm-Z/exec'
         filename = "."+filename
         with open(filename, 'rb') as image_file:
             encoded_image = base64.b64encode(image_file.read()).decode('utf-8')
@@ -383,6 +409,7 @@ class DecodeBottomImageViewSerializer(serializers.ModelSerializer):
             'filename': 'ESP32-CAM.jpg',
             'mimetype': 'image/jpeg',
                 'data': encoded_image,
+                'condition': condition,
         }
 
         headers = {
@@ -391,7 +418,6 @@ class DecodeBottomImageViewSerializer(serializers.ModelSerializer):
         }
 
         response = requests.post(url, data=params, headers=headers)
-
         return " Image 2 uploaded"
     
     
