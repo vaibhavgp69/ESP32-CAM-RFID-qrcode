@@ -8,7 +8,10 @@ from .models import Decode, DecImage
 import requests
 import cv2
 import base64
-
+from pyzbar.pyzbar import decode
+from PIL import Image
+import numpy as np
+import matplotlib.pyplot as plt
 # ---------------------------------------------------------------------------------------------
 # ---------------------------------------------------------------------------------------------
 # ---------------------------------------------------------------------------------------------
@@ -165,24 +168,33 @@ class DecodeImageViewSerializer(serializers.ModelSerializer):
 
 
     def decode_qr(self, filename):
+
         image = cv2.imread("."+filename)
-        detector = cv2.QRCodeDetector()
-        dec, vertices_array, binary_qrcode = detector.detectAndDecode(image)
-        qrCodeDetector = cv2.QRCodeDetector()
-        all_qrcodes = qrCodeDetector.detectAndDecodeMulti(image)
-        if len(all_qrcodes[1]) > 1:
-            v1 = all_qrcodes[1][0]
-            v2= all_qrcodes[1][1]
-            return v1,v2
-        elif vertices_array is not None:
-            print("QRCode data:")
-            print(dec)
-            return dec,"no 2nd qr"
-             
+        img_gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
+        _, thresh = cv2.threshold(img_gray, 200, 255, cv2.THRESH_BINARY)
+        contours, _ = cv2.findContours(thresh, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
+        min_area = float('inf')
+        min_contour = None
+        for contour in contours:
+            area = cv2.contourArea(contour)
+            if area > 8000:
+                if area < min_area:
+                    min_area = area
+                    min_contour = contour
+        if min_contour is not None:
+            x, y, w, h = cv2.boundingRect(min_contour)
+            cropped_label = image[y:y+h, x:x+w]
         else:
-            print("There was some error")
-            return "error","error"
+            print("No white label contour found in the image.")
+
+        bigger = cv2.resize(cropped_label, (500, 250))
+        decocdeQR = decode(bigger)
+        print(decocdeQR)
+        print(decocdeQR[1].data.decode('ascii'))
+        print(decocdeQR[0].data.decode('ascii'))
+        return decocdeQR[1].data.decode('ascii'), decocdeQR[0].data.decode('ascii')
         
+
     def name_sheet(self,name,sts):
         url = f'https://script.google.com/macros/s/AKfycbwhsPa5xJPl4zruZI0BxKH0i3JUTBq0M9Gr9YthIgAvgnU3fANK-5XSUS5ipb1SfylU7g/exec/exec?sts={sts}e&mac=&ser=&nam={name}&im1='   
         response = requests.get(url)
@@ -298,22 +310,33 @@ class DecodeTopImageViewSerializer(serializers.ModelSerializer):
 
 
     def decode_qr(self, filename):
+
         image = cv2.imread("."+filename)
-        detector = cv2.QRCodeDetector()
-        dec, vertices_array, binary_qrcode = detector.detectAndDecode(image)
-        qrCodeDetector = cv2.QRCodeDetector()
-        all_qrcodes = qrCodeDetector.detectAndDecodeMulti(image)
-        if len(all_qrcodes[1]) > 1:
-            v1 = all_qrcodes[1][0]
-            v2= all_qrcodes[1][1]
-            return v1,v2
-        elif vertices_array is not None:
-            print("QRCode data:")
-            return dec,"no 2nd qr"
-             
+        img_gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
+        _, thresh = cv2.threshold(img_gray, 200, 255, cv2.THRESH_BINARY)
+        contours, _ = cv2.findContours(thresh, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
+        min_area = float('inf')
+        min_contour = None
+        for contour in contours:
+            area = cv2.contourArea(contour)
+            if area > 8000:
+                if area < min_area:
+                    min_area = area
+                    min_contour = contour
+        if min_contour is not None:
+            x, y, w, h = cv2.boundingRect(min_contour)
+            cropped_label = image[y:y+h, x:x+w]
         else:
-            print("There was some error")
-            return "error","error"
+            print("No white label contour found in the image.")
+
+        bigger = cv2.resize(cropped_label, (500, 250))
+        decocdeQR = decode(bigger)
+        print(decocdeQR)
+        print(decocdeQR[1].data.decode('ascii'))
+        print(decocdeQR[0].data.decode('ascii'))
+        return decocdeQR[1].data.decode('ascii'), decocdeQR[0].data.decode('ascii')
+        
+
         
     def name_sheet(self,name,sts):
         print(sts)
