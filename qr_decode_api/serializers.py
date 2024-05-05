@@ -8,6 +8,7 @@ from .models import Decode, DecImage
 import requests
 import cv2
 import base64
+import pyqrcode
 from pyzbar.pyzbar import decode
 from PIL import Image
 import numpy as np
