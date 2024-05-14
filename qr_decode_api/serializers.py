@@ -5,6 +5,9 @@ from uuid import uuid4
 from .models import Decode, DecImage
 
 
+import os
+
+
 import requests
 import cv2
 import base64
@@ -171,25 +174,14 @@ class DecodeImageViewSerializer(serializers.ModelSerializer):
     def decode_qr(self, filename):
 
         image = cv2.imread("."+filename)
-        img_gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
-        _, thresh = cv2.threshold(img_gray, 200, 255, cv2.THRESH_BINARY)
-        contours, _ = cv2.findContours(thresh, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
-        min_area = float('inf')
-        min_contour = None
-        for contour in contours:
-            area = cv2.contourArea(contour)
-            if area > 8000:
-                if area < min_area:
-                    min_area = area
-                    min_contour = contour
-        if min_contour is not None:
-            x, y, w, h = cv2.boundingRect(min_contour)
-            cropped_label = image[y:y+h, x:x+w]
-        else:
-            print("No white label contour found in the image.")
 
-        bigger = cv2.resize(cropped_label, (500, 250))
-        decocdeQR = decode(bigger)
+        # Define the dimensions for resizing
+        width = 3000  # New width
+        height = 4000  # New height
+
+        # Resize the image
+        resized_image = cv2.resize(image, (width, height))
+        decocdeQR = decode(resized_image)
         print(decocdeQR)
         print(decocdeQR[1].data.decode('ascii'))
         print(decocdeQR[0].data.decode('ascii'))
@@ -313,25 +305,14 @@ class DecodeTopImageViewSerializer(serializers.ModelSerializer):
     def decode_qr(self, filename):
 
         image = cv2.imread("."+filename)
-        img_gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
-        _, thresh = cv2.threshold(img_gray, 200, 255, cv2.THRESH_BINARY)
-        contours, _ = cv2.findContours(thresh, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
-        min_area = float('inf')
-        min_contour = None
-        for contour in contours:
-            area = cv2.contourArea(contour)
-            if area > 8000:
-                if area < min_area:
-                    min_area = area
-                    min_contour = contour
-        if min_contour is not None:
-            x, y, w, h = cv2.boundingRect(min_contour)
-            cropped_label = image[y:y+h, x:x+w]
-        else:
-            print("No white label contour found in the image.")
 
-        bigger = cv2.resize(cropped_label, (500, 250))
-        decocdeQR = decode(bigger)
+        # Define the dimensions for resizing
+        width = 3000  # New width
+        height = 4000  # New height
+
+        # Resize the image
+        resized_image = cv2.resize(image, (width, height))
+        decocdeQR = decode(resized_image)
         print(decocdeQR)
         print(decocdeQR[1].data.decode('ascii'))
         print(decocdeQR[0].data.decode('ascii'))
